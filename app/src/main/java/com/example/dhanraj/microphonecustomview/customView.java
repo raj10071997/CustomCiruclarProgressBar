@@ -16,6 +16,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import static java.lang.Thread.sleep;
 import static java.sql.Types.NULL;
 
@@ -35,15 +38,17 @@ public class customView extends View {
     int imageSize=0;
     Handler handler;
     static int timer=0;
-    int degree1 = -90,degree2=90,degree1Old=0,degree2Old;
-    boolean checkDown = false,first =true;
+    int topdegree = -90;
+    int bottomdegree = 90;
+    int degree1 = -90,degree2=220,degree1Old=50,degree2Old=50;
+    boolean checkDown = false,first =true,rotate = false;
 
     int oldX,oldY,newX,newY,mX=250,mY=250;
 
 
    // ValueAnimator animation;
 
-    private boolean animated;
+    private boolean animated,animated2;
     private long animationDuration = 4000l; //default duration
     ValueAnimator animation = null;
 
@@ -147,16 +152,50 @@ public class customView extends View {
                     degree1+=0.5;
                 }*/
 
-            if(degree1Old<=180)
-            canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
-                    (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                    (float)degree1,(float)degree1Old,false,linePaint);
+            if(degree1<=40 && degree2>=90)
+            {
+                canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
+                        (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
+                        (float)degree1,(float)degree1Old,false,linePaint);
+                canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
+                        (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
+                        (float)degree2,(float)degree2Old,false,linePaint);
+
+            }
             else
                 animated=false;
 
             canvasAnimate(canvas);
 
            // canvas.drawLine();
+
+        }
+
+        if(rotate)
+        {
+
+
+
+
+                canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
+                        (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
+                        (float)topdegree,(float)degree1Old,false,linePaint);
+
+                canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
+                        (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
+                        (float)bottomdegree,(float)degree2Old,false,linePaint);
+
+                topdegree+=10;
+                bottomdegree+=10;
+
+                if(topdegree>=360)
+                    topdegree=0;
+
+                if(bottomdegree>=360)
+                    bottomdegree=0;
+
+            canvasAnimate(canvas);
+
 
         }
 
@@ -170,23 +209,25 @@ public class customView extends View {
         }
 
         if(animated) {
-            animation = ValueAnimator.ofFloat(0, 180);
-            animation.setDuration(2000l);
-            animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                   /* valueToDraw = (float) valueAnimator.getAnimatedValue();
-                    ValueBar.this.invalidate();*/
-                   Log.d("dhanraj","richa");
-                    if(degree1Old<180)
-                    degree1Old+=1;
-                }
-            });
 
-            animation.start();
+                    invalidate();
+                   Log.d("dhanrajanimated", String.valueOf(animation.getAnimatedFraction()));
+                    if(degree1<40)
+                    degree1+=10;
+
+                    if(degree2>90)
+                       degree2-=10;
+
 
         }
-        invalidate();
+
+        if(animated2)
+        {
+
+                    invalidate();
+
+        }
+
     }
 
 
@@ -204,7 +245,7 @@ public class customView extends View {
                     strokePaint.setColor(Color.RED);
                     invalidate();
                 }*/
-                if(degree1!=90)
+                if(degree1!=40)
                 {
                     checkDown = true;
                     //drawLine();
@@ -223,7 +264,13 @@ public class customView extends View {
             case MotionEvent.ACTION_UP:
                 Log.d("dhanraj3","sahu3");
                 checkDown = false;
-                degree1Old=0;
+                degree1=-90;
+                degree2=220;
+                animated=false;
+                animated2=true;
+                rotate=true;
+               // rotateProgress();
+
                 invalidate();
                // change();
 
@@ -233,6 +280,20 @@ public class customView extends View {
 
        // postInvalidate();
         return true;
+    }
+
+    private void rotateProgress() {
+
+        rotate = true;
+        invalidate();
+       /* try {
+            sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+
+
+
     }
 
     private void drawLine() {
