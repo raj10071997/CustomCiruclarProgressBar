@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircularProgressBar">
+        <attr name="label" format="string" />
+        <attr name="rotating_bar_color" format="color" />
+        <attr name="main_circle_color" format="color" />
+        <attr name="label_size" format="integer" />
+        <attr name="label_color" format="color" />
+        <attr name="stroke_width" format="float" />
+        <attr name="sweep_angle" format="float" />
+        <attr name="main_circle_radius" format="float" />
+        <attr name="Image" format="integer"/>
+    </declare-styleable>
+</resources>

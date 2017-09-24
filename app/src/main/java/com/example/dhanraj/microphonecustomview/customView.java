@@ -2,6 +2,7 @@ package com.example.dhanraj.microphonecustomview;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.CornerPathEffect;
@@ -15,6 +16,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,12 +34,13 @@ public class customView extends View {
 
     Drawable micro;
     Paint circlePaint,mPaint;
+    String label;
     Paint strokePaint,linePaint;
     int width=0;
     int height=0;
     int min=0;
     int imageSize=0;
-    Handler handler;
+    //Handler handler;
     static int timer=0;
     int topdegree = -90;
     int bottomdegree = 90;
@@ -44,9 +48,12 @@ public class customView extends View {
     boolean checkDown = false,first =true,rotate = false;
 
     int oldX,oldY,newX,newY,mX=250,mY=250;
+    final Handler handler = new Handler();
+    int ImageID,labalColor,mainCircleColor,labelSize,sweepAngle,rotatingBarColor;
+    float strokeWidth,mainCirCleRadius;
 
 
-   // ValueAnimator animation;
+    // ValueAnimator animation;
 
     private boolean animated,animated2;
     private long animationDuration = 4000l; //default duration
@@ -105,18 +112,47 @@ public class customView extends View {
         strokePaint.setStrokeWidth(20);
 
         linePaint = new Paint();
-        strokePaint.setAntiAlias(true);
+        linePaint.setAntiAlias(true);
         linePaint.setColor(Color.GREEN);
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setStrokeWidth(20);
 
-        handler = new Handler();
+       // handler = new Handler();
         mPaint = new Paint();
 
         animation = ValueAnimator.ofFloat(0, 180);
         animation.setDuration(2000l); //one second
 
     }
+
+    private void initXMLAttrs(Context context, AttributeSet attrs) {
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CircularProgressBar);
+        final int N = a.getIndexCount();
+        for (int i = 0; i < N; ++i) {
+            int attr = a.getIndex(i);
+            if (attr == R.styleable.CircularProgressBar_label) {
+                setLabel(a.getString(attr));
+            } else if (attr == R.styleable.CircularProgressBar_label_color) {
+                setLabalColor(a.getColor(attr, Color.parseColor("#222222")));
+            } else if (attr == R.styleable.CircularProgressBar_main_circle_color) {
+                setMainCircleColor(a.getColor(attr, Color.parseColor("#000000")));
+            } else if (attr == R.styleable.CircularProgressBar_label_size) {
+                setLabelSize(a.getInteger(attr, 40));
+            } else if (attr == R.styleable.CircularProgressBar_stroke_width) {
+                setStrokeWidth(a.getFloat(attr, 25));
+            } else if (attr == R.styleable.CircularProgressBar_sweep_angle) {
+                setSweepAngle(a.getInt(attr, -1));
+            } else if (attr == R.styleable.CircularProgressBar_main_circle_radius) {
+                setMainCirCleRadius(a.getFloat(attr, -1));
+            } else if (attr == R.styleable.CircularProgressBar_rotating_bar_color) {
+                setRotatingBarColor(a.getColor(attr, Color.parseColor("#FFA036")));
+            } else if (attr == R.styleable.CircularProgressBar_Image) {
+                setImageID(a.getInt(attr, -1));
+            }
+        }
+        a.recycle();
+    }
+
 
 
 
@@ -177,24 +213,26 @@ public class customView extends View {
 
 
 
-                canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
-                        (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                        (float)topdegree,(float)degree1Old,false,linePaint);
+                    canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
+                            (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
+                            (float)topdegree,(float)degree1Old,false,linePaint);
 
-                canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
-                        (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                        (float)bottomdegree,(float)degree2Old,false,linePaint);
+                    canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
+                            (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
+                            (float)bottomdegree,(float)degree2Old,false,linePaint);
 
-                topdegree+=10;
-                bottomdegree+=10;
+                    topdegree+=5;
+                    bottomdegree+=5;
 
-                if(topdegree>=360)
-                    topdegree=0;
+                    if(topdegree>=360)
+                        topdegree=0;
 
-                if(bottomdegree>=360)
-                    bottomdegree=0;
+                    if(bottomdegree>=360)
+                        bottomdegree=0;
 
-            canvasAnimate(canvas);
+
+
+            //   canvasAnimate(canvas);
 
 
         }
@@ -223,6 +261,24 @@ public class customView extends View {
 
         if(animated2)
         {
+
+            animation = ValueAnimator.ofFloat(0.0f, 5.0f);
+            //animationDuration specifies how long it should take to animate the entire graph, so the
+            //actual value to use depends on how much the value needs to change
+//            int changeInValue = Math.abs(currentValue - previousValue);
+//            long durationToUse = (long) (animationDuration * ((float) changeInValue / (float) maxValue));
+            animation.setDuration(20l);
+            animation.setInterpolator(new AccelerateInterpolator());
+
+            animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    invalidate();
+                }
+            });
+
+            animation.start();
+
 
                     invalidate();
 
@@ -378,4 +434,77 @@ public class customView extends View {
         this._x = xcenter+Math.cos(radian)*radius;
         this._y = ycenter-Math.sin(radian)*radius;
     }*/
+
+
+    public int getImageID() {
+        return ImageID;
+    }
+
+    public void setImageID(int imageID) {
+        ImageID = imageID;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public int getLabalColor() {
+        return labalColor;
+    }
+
+    public void setLabalColor(int labalColor) {
+        this.labalColor = labalColor;
+    }
+
+    public int getMainCircleColor() {
+        return mainCircleColor;
+    }
+
+    public void setMainCircleColor(int mainCircleColor) {
+        this.mainCircleColor = mainCircleColor;
+    }
+
+    public int getLabelSize() {
+        return labelSize;
+    }
+
+    public void setLabelSize(int labelSize) {
+        this.labelSize = labelSize;
+    }
+
+    public float getStrokeWidth() {
+        return strokeWidth;
+    }
+
+    public void setStrokeWidth(float strokeWidth) {
+        this.strokeWidth = strokeWidth;
+    }
+
+    public int getSweepAngle() {
+        return sweepAngle;
+    }
+
+    public void setSweepAngle(int sweepAngle) {
+        this.sweepAngle = sweepAngle;
+    }
+
+    public float getMainCirCleRadius() {
+        return mainCirCleRadius;
+    }
+
+    public void setMainCirCleRadius(float mainCirCleRadius) {
+        this.mainCirCleRadius = mainCirCleRadius;
+    }
+
+    public int getRotatingBarColor() {
+        return rotatingBarColor;
+    }
+
+    public void setRotatingBarColor(int rotatingBarColor) {
+        this.rotatingBarColor = rotatingBarColor;
+    }
 }
