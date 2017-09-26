@@ -10,5 +10,6 @@
         <attr name="sweep_angle" format="float" />
         <attr name="main_circle_radius" format="float" />
         <attr name="Image" format="integer"/>
+        <attr name="dialog_text" formar="string"/>
     </declare-styleable>
 </resources>

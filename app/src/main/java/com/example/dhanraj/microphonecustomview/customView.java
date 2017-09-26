@@ -1,6 +1,7 @@
 package com.example.dhanraj.microphonecustomview;
 
 import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -16,8 +17,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,8 +36,9 @@ public class customView extends View {
 
 
     Drawable micro;
+    private CustomDialog cd;
     Paint circlePaint,mPaint;
-    String label;
+    String label,dialogText;
     Paint strokePaint,linePaint;
     int width=0;
     int height=0;
@@ -51,6 +55,8 @@ public class customView extends View {
     final Handler handler = new Handler();
     int ImageID,labalColor,mainCircleColor,labelSize,sweepAngle,rotatingBarColor;
     float strokeWidth,mainCirCleRadius;
+    private Dialog overlayDialog;
+    private Context mContext;
 
 
     // ValueAnimator animation;
@@ -78,27 +84,31 @@ public class customView extends View {
 
     public customView(Context context) {
         super(context);
-        init();
+        mContext=context;
+        init(context);
     }
 
 
     public customView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        mContext=context;
+        init(context);
     }
 
     public customView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        mContext=context;
+        init(context);
     }
 
     public customView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        mContext=context;
+        init(context);
     }
 
 
-    private void init() {
+    private void init(Context context) {
 
         circlePaint = new Paint();
         circlePaint.setAntiAlias(true);
@@ -122,6 +132,13 @@ public class customView extends View {
 
         animation = ValueAnimator.ofFloat(0, 180);
         animation.setDuration(2000l); //one second
+
+        cd = new CustomDialog(context);
+        //change the value below
+        cd.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        cd.textView.setText("wait...");
+
+
 
     }
 
@@ -148,6 +165,9 @@ public class customView extends View {
                 setRotatingBarColor(a.getColor(attr, Color.parseColor("#FFA036")));
             } else if (attr == R.styleable.CircularProgressBar_Image) {
                 setImageID(a.getInt(attr, -1));
+            }else if(attr==R.styleable.CircularProgressBar_dialog_text)
+            {
+                setDialogText(a.getString(attr));
             }
         }
         a.recycle();
@@ -232,7 +252,7 @@ public class customView extends View {
 
 
 
-            //   canvasAnimate(canvas);
+              canvasAnimate(canvas);
 
 
         }
@@ -295,12 +315,6 @@ public class customView extends View {
         switch(eventAction)
         {
             case MotionEvent.ACTION_DOWN:
-                Log.d("dhanraj","sahu");
-                /*if(timer==0)
-                {
-                    strokePaint.setColor(Color.RED);
-                    invalidate();
-                }*/
                 if(degree1!=40)
                 {
                     checkDown = true;
@@ -310,62 +324,50 @@ public class customView extends View {
                 }
                     break;
             case MotionEvent.ACTION_MOVE:
-                Log.d("dhanraj2","sahu2");
-               /* if(timer==0)
-                {
-                    strokePaint.setColor(Color.RED);
-                    invalidate();
-                }*/
                 break;
             case MotionEvent.ACTION_UP:
-                Log.d("dhanraj3","sahu3");
                 checkDown = false;
                 degree1=-90;
                 degree2=220;
                 animated=false;
                 animated2=true;
                 rotate=true;
-               // rotateProgress();
-
                 invalidate();
+               // showDialog(mContext);
+
                // change();
 
                 break;
         }
 
-
-       // postInvalidate();
         return true;
     }
 
-    private void rotateProgress() {
 
-        rotate = true;
-        invalidate();
-       /* try {
-            sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+    public void showDialog(Context context) {
 
-
-
+        if (overlayDialog == null) {
+            overlayDialog = new Dialog(context, android.R.style.Theme_Panel);
+            overlayDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
+        }
+        overlayDialog.show();
     }
 
-    private void drawLine() {
+    public void hideDialog() {
+        if (overlayDialog == null ) {
+            return;
+        }
+        overlayDialog.cancel();
+    }
 
 
-        //degree2Old=degree2;
+    public void drawLine() {
+
         invalidate();
         degree1+=5;
         degree2-=5;
         degree1Old+=5;
 
-
-
-
-        /*if(degree1==360)
-            degree1=0;*/
 
         if(degree1!=90)
             drawLine();
@@ -378,7 +380,7 @@ public class customView extends View {
 
     }
 
-    private void change()
+    public  void change()
     {
         if(timer<500) {
 
@@ -413,6 +415,15 @@ public class customView extends View {
         min = Math.min(width,height);
 
         imageSize = (int)(min*0.5);
+    }
+
+    public void stopProgressing()
+    {
+
+        checkDown=false;
+        rotate=false;
+        invalidate();
+        hideDialog();
     }
 
 
@@ -506,5 +517,13 @@ public class customView extends View {
 
     public void setRotatingBarColor(int rotatingBarColor) {
         this.rotatingBarColor = rotatingBarColor;
+    }
+
+    public String getDialogText() {
+        return dialogText;
+    }
+
+    public void setDialogText(String dialogText) {
+        this.dialogText = dialogText;
     }
 }
