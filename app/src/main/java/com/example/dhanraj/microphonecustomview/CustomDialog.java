@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
+import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -39,6 +40,7 @@ public class CustomDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.custom_dialog);
         textView = (TextView) findViewById(R.id.mytext);
+        textView.setText("wait...");
 
 
     }

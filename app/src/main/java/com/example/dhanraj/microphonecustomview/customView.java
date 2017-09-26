@@ -35,51 +35,29 @@ import static java.sql.Types.NULL;
 public class customView extends View {
 
 
-    Drawable micro;
+    private Drawable micro;
     private CustomDialog cd;
-    Paint circlePaint,mPaint;
-    String label,dialogText;
-    Paint strokePaint,linePaint;
+    private Paint circlePaint,mPaint,strokePaint,linePaint,textPaint;
+    private String label,dialogText,dialogText2="wait.";
     int width=0;
     int height=0;
     int min=0;
     int imageSize=0;
-    //Handler handler;
-    static int timer=0;
+    int timer=0;
     int topdegree = -90;
     int bottomdegree = 90;
     int degree1 = -90,degree2=220,degree1Old=50,degree2Old=50;
-    boolean checkDown = false,first =true,rotate = false;
-
-    int oldX,oldY,newX,newY,mX=250,mY=250;
+    boolean checkDown = false,first =true,rotate = false,dialog_animation,wantTextOverTheImage;
     final Handler handler = new Handler();
     int ImageID,labalColor,mainCircleColor,labelSize,sweepAngle,rotatingBarColor;
     float strokeWidth,mainCirCleRadius;
     private Dialog overlayDialog;
     private Context mContext;
-
-
     // ValueAnimator animation;
 
     private boolean animated,animated2;
     private long animationDuration = 4000l; //default duration
-    ValueAnimator animation = null;
-
-    public void setAnimated(boolean animated) {
-        this.animated = animated;
-    }
-
-    public void setAnimationDuration(long animationDuration) {
-        this.animationDuration = animationDuration;
-    }
-
-
-    Runnable r  = new Runnable() {
-        @Override
-        public void run() {
-            change();
-        }
-    };
+    private ValueAnimator animation = null;
 
 
     public customView(Context context) {
@@ -127,16 +105,27 @@ public class customView extends View {
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setStrokeWidth(20);
 
-       // handler = new Handler();
         mPaint = new Paint();
 
-        animation = ValueAnimator.ofFloat(0, 180);
-        animation.setDuration(2000l); //one second
 
-        cd = new CustomDialog(context);
+        textPaint = new Paint();
+        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setStyle(Paint.Style.STROKE);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        //set the size with repect to the radius of the circle
+        textPaint.setTextSize(70);
+
+        animation = ValueAnimator.ofFloat(0, 180);
+        animation.setDuration(2000l);
+
+        cd = new CustomDialog(getContext());
         //change the value below
+        if(true) //dialog_animation
         cd.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-        cd.textView.setText("wait...");
+
+
+       // cd.textView.setText("wait...");
 
 
 
@@ -168,6 +157,8 @@ public class customView extends View {
             }else if(attr==R.styleable.CircularProgressBar_dialog_text)
             {
                 setDialogText(a.getString(attr));
+            }else if(attr==R.styleable.CircularProgressBar_dialog_animation){
+                setDialog_animation(a.getBoolean(attr,false));
             }
         }
         a.recycle();
@@ -180,8 +171,6 @@ public class customView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
-            //canvas.drawCircle(width/2,height/2,(float)(min-100),circlePaint);
             canvas.drawCircle(width/2,height/2,(float)(Math.sqrt(2)*imageSize)/2,strokePaint);
 
             if(micro == null){
@@ -199,15 +188,6 @@ public class customView extends View {
         if(checkDown)
         {
 
-            /*animation.start();
-                for(;degree1!=90;)
-                {
-                    canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
-                            (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                            (float)degree1,(float)1,false,linePaint);
-                    degree1+=0.5;
-                }*/
-
             if(degree1<=40 && degree2>=90)
             {
                 canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
@@ -217,21 +197,17 @@ public class customView extends View {
                         (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
                         (float)degree2,(float)degree2Old,false,linePaint);
 
+
             }
             else
                 animated=false;
 
             canvasAnimate(canvas);
 
-           // canvas.drawLine();
-
         }
 
         if(rotate)
         {
-
-
-
 
                     canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                             (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
@@ -241,6 +217,17 @@ public class customView extends View {
                             (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
                             (float)bottomdegree,(float)degree2Old,false,linePaint);
 
+                    if(wantTextOverTheImage)
+                    {
+                        canvas.drawText(dialogText2,width/2,height/2,textPaint);
+
+                        if(dialogText2.length()==7)
+                            dialogText2="wait.";
+                        else
+                            dialogText2=dialogText2+".";
+                    }
+
+
                     topdegree+=5;
                     bottomdegree+=5;
 
@@ -249,8 +236,6 @@ public class customView extends View {
 
                     if(bottomdegree>=360)
                         bottomdegree=0;
-
-
 
               canvasAnimate(canvas);
 
@@ -282,25 +267,29 @@ public class customView extends View {
         if(animated2)
         {
 
-            animation = ValueAnimator.ofFloat(0.0f, 5.0f);
-            //animationDuration specifies how long it should take to animate the entire graph, so the
-            //actual value to use depends on how much the value needs to change
-//            int changeInValue = Math.abs(currentValue - previousValue);
-//            long durationToUse = (long) (animationDuration * ((float) changeInValue / (float) maxValue));
-            animation.setDuration(20l);
-            animation.setInterpolator(new AccelerateInterpolator());
+//            animation = ValueAnimator.ofFloat(0.0f, 5.0f);
+//            //animationDuration specifies how long it should take to animate the entire graph, so the
+//            //actual value to use depends on how much the value needs to change
+////            int changeInValue = Math.abs(currentValue - previousValue);
+////            long durationToUse = (long) (animationDuration * ((float) changeInValue / (float) maxValue));
+//            animation.setDuration(10000l);
+//            animation.setInterpolator(new AccelerateInterpolator());
+//
+//            animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                @Override
+//                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                    invalidate();
+//                }
+//            });
+//
+//            animation.start();
 
-            animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    invalidate();
-                }
-            });
-
-            animation.start();
-
-
-                    invalidate();
+            try {
+                sleep(250);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            invalidate();
 
         }
 
@@ -318,7 +307,6 @@ public class customView extends View {
                 if(degree1!=40)
                 {
                     checkDown = true;
-                    //drawLine();
                     animated=true;
                     invalidate();
                 }
@@ -333,10 +321,8 @@ public class customView extends View {
                 animated2=true;
                 rotate=true;
                 invalidate();
+              //  cd.show();
                // showDialog(mContext);
-
-               // change();
-
                 break;
         }
 
@@ -361,46 +347,6 @@ public class customView extends View {
     }
 
 
-    public void drawLine() {
-
-        invalidate();
-        degree1+=5;
-        degree2-=5;
-        degree1Old+=5;
-
-
-        if(degree1!=90)
-            drawLine();
-        else
-        {
-            degree1=-90;
-            degree1Old=0;
-            checkDown=false;
-        }
-
-    }
-
-    public  void change()
-    {
-        if(timer<500) {
-
-            handler.postDelayed(r, 1);
-            timer++;
-            if (timer % 2 == 0)
-                strokePaint.setColor(Color.YELLOW);
-            else
-                strokePaint.setColor(Color.GREEN);
-
-            invalidate();
-
-        }
-        else
-        {
-           // timer =0;
-            handler.removeCallbacks(r);
-        }
-
-    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -453,6 +399,7 @@ public class customView extends View {
 
     public void setImageID(int imageID) {
         ImageID = imageID;
+        invalidate();
     }
 
     public String getLabel() {
@@ -461,6 +408,7 @@ public class customView extends View {
 
     public void setLabel(String label) {
         this.label = label;
+        invalidate();
     }
 
     public int getLabalColor() {
@@ -469,6 +417,7 @@ public class customView extends View {
 
     public void setLabalColor(int labalColor) {
         this.labalColor = labalColor;
+        invalidate();
     }
 
     public int getMainCircleColor() {
@@ -477,6 +426,7 @@ public class customView extends View {
 
     public void setMainCircleColor(int mainCircleColor) {
         this.mainCircleColor = mainCircleColor;
+        invalidate();
     }
 
     public int getLabelSize() {
@@ -485,6 +435,7 @@ public class customView extends View {
 
     public void setLabelSize(int labelSize) {
         this.labelSize = labelSize;
+        invalidate();
     }
 
     public float getStrokeWidth() {
@@ -493,6 +444,7 @@ public class customView extends View {
 
     public void setStrokeWidth(float strokeWidth) {
         this.strokeWidth = strokeWidth;
+        invalidate();
     }
 
     public int getSweepAngle() {
@@ -501,6 +453,7 @@ public class customView extends View {
 
     public void setSweepAngle(int sweepAngle) {
         this.sweepAngle = sweepAngle;
+        invalidate();
     }
 
     public float getMainCirCleRadius() {
@@ -509,6 +462,7 @@ public class customView extends View {
 
     public void setMainCirCleRadius(float mainCirCleRadius) {
         this.mainCirCleRadius = mainCirCleRadius;
+        invalidate();
     }
 
     public int getRotatingBarColor() {
@@ -517,6 +471,7 @@ public class customView extends View {
 
     public void setRotatingBarColor(int rotatingBarColor) {
         this.rotatingBarColor = rotatingBarColor;
+        invalidate();
     }
 
     public String getDialogText() {
@@ -525,5 +480,33 @@ public class customView extends View {
 
     public void setDialogText(String dialogText) {
         this.dialogText = dialogText;
+        invalidate();
+    }
+
+    public boolean isDialog_animation() {
+        return dialog_animation;
+    }
+
+    public void setDialog_animation(boolean dialog_animation) {
+        this.dialog_animation = dialog_animation;
+        invalidate();
+    }
+    public void setAnimated(boolean animated) {
+        this.animated = animated;
+        invalidate();
+    }
+
+    public void setAnimationDuration(long animationDuration) {
+        this.animationDuration = animationDuration;
+        invalidate();
+    }
+
+    public boolean isWantTextOverTheImage() {
+        return wantTextOverTheImage;
+    }
+
+    public void setWantTextOverTheImage(boolean wantTextOverTheImage) {
+        this.wantTextOverTheImage = wantTextOverTheImage;
+        invalidate();
     }
 }
