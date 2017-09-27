@@ -6,8 +6,6 @@
     android:layout_height="wrap_content"
     android:background="@layout/curve_shape"
     android:shape="rectangle"
-    android:clipToPadding="true"
-
     >
 
     <TextView
@@ -15,7 +13,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/mytext"
         android:textStyle="italic"
-        android:textSize="30dp"
+        android:textSize="20dp"
         android:textColor="#000000"/>
 
 </LinearLayout>

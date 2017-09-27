@@ -9,8 +9,9 @@
         <attr name="stroke_width" format="float" />
         <attr name="sweep_angle" format="float" />
         <attr name="main_circle_radius" format="float" />
-        <attr name="Image" format="integer"/>
+        <attr name="Image" format="reference"/>
         <attr name="dialog_text" format="string"/>
         <attr name="dialog_animation" format="boolean"/>
+        <attr name="rotatingInverseRate" format="integer"/>
     </declare-styleable>
 </resources>

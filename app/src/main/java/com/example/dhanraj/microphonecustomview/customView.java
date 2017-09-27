@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -21,6 +22,7 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,27 +39,24 @@ public class customView extends View {
 
     private Drawable micro;
     private CustomDialog cd;
-    private Paint circlePaint,mPaint,strokePaint,linePaint,textPaint;
+    private Paint strokePaint,linePaint,textPaint;
     private String label,dialogText,dialogText2="wait.";
     int width=0;
     int height=0;
     int min=0;
     int imageSize=0;
-    int timer=0;
+    long rotatingInverseRate=0;
     int topdegree = -90;
     int bottomdegree = 90;
-    int degree1 = -90,degree2=220,degree1Old=50,degree2Old=50;
-    boolean checkDown = false,first =true,rotate = false,dialog_animation,wantTextOverTheImage;
-    final Handler handler = new Handler();
-    int ImageID,labalColor,mainCircleColor,labelSize,sweepAngle,rotatingBarColor;
-    float strokeWidth,mainCirCleRadius;
+    int degree1 = -90,degree2=220;
+    boolean checkDown = false,first =true,rotate = false,dialog_animation,wantTextOverTheImage=true;
+    int labelColor,mainCircleColor,labelSize,rotatingBarColor;
+    float strokeWidth,mainCirCleRadius,sweepAngle;
+    int ImageID;
     private Dialog overlayDialog;
     private Context mContext;
-    // ValueAnimator animation;
-
     private boolean animated,animated2;
-    private long animationDuration = 4000l; //default duration
-    private ValueAnimator animation = null;
+
 
 
     public customView(Context context) {
@@ -70,59 +69,56 @@ public class customView extends View {
     public customView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext=context;
+        initXMLAttrs(context, attrs);
         init(context);
     }
 
     public customView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext=context;
+        initXMLAttrs(context, attrs);
         init(context);
     }
 
     public customView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         mContext=context;
+        initXMLAttrs(context, attrs);
         init(context);
     }
 
 
     private void init(Context context) {
 
-        circlePaint = new Paint();
-        circlePaint.setAntiAlias(true);
-        circlePaint.setStyle(Paint.Style.FILL);
-        circlePaint.setColor(Color.YELLOW);
-
         strokePaint = new Paint();
         strokePaint.setAntiAlias(true);
         strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setColor(Color.BLUE);
-        strokePaint.setStrokeWidth(20);
+        Log.d("mainColor", String.valueOf(getMainCircleColor()));
+        strokePaint.setColor(getMainCircleColor());
+        strokePaint.setStrokeWidth(getStrokeWidth());
 
         linePaint = new Paint();
         linePaint.setAntiAlias(true);
-        linePaint.setColor(Color.GREEN);
+        linePaint.setColor(getRotatingBarColor());
         linePaint.setStyle(Paint.Style.STROKE);
-        linePaint.setStrokeWidth(20);
+        linePaint.setStrokeWidth(getStrokeWidth());
 
-        mPaint = new Paint();
-
-
-        textPaint = new Paint();
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setColor(Color.BLACK);
+        textPaint.setColor(getLabelColor());
         textPaint.setStyle(Paint.Style.STROKE);
+        textPaint.setStrokeWidth(1);
         textPaint.setTextAlign(Paint.Align.CENTER);
         //set the size with repect to the radius of the circle
-        textPaint.setTextSize(70);
+        //textPaint.setTextSize((float)(Math.sqrt(2)*imageSize)/2);
+        textPaint.setTextSize((float)getLabelSize());
 
-        animation = ValueAnimator.ofFloat(0, 180);
-        animation.setDuration(2000l);
 
         cd = new CustomDialog(getContext());
         //change the value below
         if(true) //dialog_animation
         cd.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+
+
 
 
        // cd.textView.setText("wait...");
@@ -131,7 +127,7 @@ public class customView extends View {
 
     }
 
-    private void initXMLAttrs(Context context, AttributeSet attrs) {
+    private void initXMLAttrs(final Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CircularProgressBar);
         final int N = a.getIndexCount();
         for (int i = 0; i < N; ++i) {
@@ -139,26 +135,29 @@ public class customView extends View {
             if (attr == R.styleable.CircularProgressBar_label) {
                 setLabel(a.getString(attr));
             } else if (attr == R.styleable.CircularProgressBar_label_color) {
-                setLabalColor(a.getColor(attr, Color.parseColor("#222222")));
+                setLabelColor(a.getColor(attr, Color.parseColor("#FF9900")));
             } else if (attr == R.styleable.CircularProgressBar_main_circle_color) {
-                setMainCircleColor(a.getColor(attr, Color.parseColor("#000000")));
+                setMainCircleColor(a.getColor(attr, Color.parseColor("#097054")));
             } else if (attr == R.styleable.CircularProgressBar_label_size) {
                 setLabelSize(a.getInteger(attr, 40));
             } else if (attr == R.styleable.CircularProgressBar_stroke_width) {
-                setStrokeWidth(a.getFloat(attr, 25));
+                setStrokeWidth(a.getFloat(attr, 20));
             } else if (attr == R.styleable.CircularProgressBar_sweep_angle) {
-                setSweepAngle(a.getInt(attr, -1));
-            } else if (attr == R.styleable.CircularProgressBar_main_circle_radius) {
+                setSweepAngle(a.getFloat(attr, (float) 50.0));
+            } else if (attr == R.styleable.CircularProgressBar_main_circle_radius) //no use of it
+            {
                 setMainCirCleRadius(a.getFloat(attr, -1));
             } else if (attr == R.styleable.CircularProgressBar_rotating_bar_color) {
-                setRotatingBarColor(a.getColor(attr, Color.parseColor("#FFA036")));
+                setRotatingBarColor(a.getColor(attr, Color.parseColor("#6599FF")));
             } else if (attr == R.styleable.CircularProgressBar_Image) {
-                setImageID(a.getInt(attr, -1));
+                setImageID(a.getResourceId(attr,-1));
             }else if(attr==R.styleable.CircularProgressBar_dialog_text)
             {
                 setDialogText(a.getString(attr));
             }else if(attr==R.styleable.CircularProgressBar_dialog_animation){
                 setDialog_animation(a.getBoolean(attr,false));
+            }else if(attr==R.styleable.CircularProgressBar_rotatingInverseRate){
+                setRotatingInverseRate(a.getInt(attr,200));
             }
         }
         a.recycle();
@@ -174,7 +173,7 @@ public class customView extends View {
             canvas.drawCircle(width/2,height/2,(float)(Math.sqrt(2)*imageSize)/2,strokePaint);
 
             if(micro == null){
-                micro = ContextCompat.getDrawable(getContext(), R.drawable.microphone);
+                micro = ContextCompat.getDrawable(getContext(),ImageID);
                 micro.setFilterBitmap(true);
                 micro.setBounds((width - imageSize) / 2, (height - imageSize) / 2, width - ((width - imageSize) / 2), height - ((height - imageSize) / 2));
                 // micro.setBounds(0, 0, width , height );
@@ -192,10 +191,10 @@ public class customView extends View {
             {
                 canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                         (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                        (float)degree1,(float)degree1Old,false,linePaint);
+                        (float)degree1,(float)sweepAngle,false,linePaint);
                 canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                         (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                        (float)degree2,(float)degree2Old,false,linePaint);
+                        (float)degree2,(float)sweepAngle,false,linePaint);
 
 
             }
@@ -211,18 +210,18 @@ public class customView extends View {
 
                     canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                             (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                            (float)topdegree,(float)degree1Old,false,linePaint);
+                            (float)topdegree,(float)sweepAngle,false,linePaint);
 
                     canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                             (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                            (float)bottomdegree,(float)degree2Old,false,linePaint);
+                            (float)bottomdegree,(float)sweepAngle,false,linePaint);
 
                     if(wantTextOverTheImage)
                     {
                         canvas.drawText(dialogText2,width/2,height/2,textPaint);
 
-                        if(dialogText2.length()==7)
-                            dialogText2="wait.";
+                        if(dialogText2.length()==label.length()+3)
+                            dialogText2=label;
                         else
                             dialogText2=dialogText2+".";
                     }
@@ -247,14 +246,11 @@ public class customView extends View {
 
     private void canvasAnimate(final Canvas canvas) {
 
-        if(animation != null) {
-            animation.cancel();
-        }
 
         if(animated) {
 
                     invalidate();
-                   Log.d("dhanrajanimated", String.valueOf(animation.getAnimatedFraction()));
+
                     if(degree1<40)
                     degree1+=10;
 
@@ -267,25 +263,8 @@ public class customView extends View {
         if(animated2)
         {
 
-//            animation = ValueAnimator.ofFloat(0.0f, 5.0f);
-//            //animationDuration specifies how long it should take to animate the entire graph, so the
-//            //actual value to use depends on how much the value needs to change
-////            int changeInValue = Math.abs(currentValue - previousValue);
-////            long durationToUse = (long) (animationDuration * ((float) changeInValue / (float) maxValue));
-//            animation.setDuration(10000l);
-//            animation.setInterpolator(new AccelerateInterpolator());
-//
-//            animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                @Override
-//                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                    invalidate();
-//                }
-//            });
-//
-//            animation.start();
-
             try {
-                sleep(250);
+                sleep(rotatingInverseRate);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -368,8 +347,14 @@ public class customView extends View {
 
         checkDown=false;
         rotate=false;
-        invalidate();
         hideDialog();
+        try {
+            sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        invalidate();
+
     }
 
 
@@ -411,12 +396,12 @@ public class customView extends View {
         invalidate();
     }
 
-    public int getLabalColor() {
-        return labalColor;
+    public int getLabelColor() {
+        return labelColor;
     }
 
-    public void setLabalColor(int labalColor) {
-        this.labalColor = labalColor;
+    public void setLabelColor(int labelColor) {
+        this.labelColor = labelColor;
         invalidate();
     }
 
@@ -447,11 +432,11 @@ public class customView extends View {
         invalidate();
     }
 
-    public int getSweepAngle() {
+    public float getSweepAngle() {
         return sweepAngle;
     }
 
-    public void setSweepAngle(int sweepAngle) {
+    public void setSweepAngle(float sweepAngle) {
         this.sweepAngle = sweepAngle;
         invalidate();
     }
@@ -496,10 +481,7 @@ public class customView extends View {
         invalidate();
     }
 
-    public void setAnimationDuration(long animationDuration) {
-        this.animationDuration = animationDuration;
-        invalidate();
-    }
+
 
     public boolean isWantTextOverTheImage() {
         return wantTextOverTheImage;
@@ -508,5 +490,13 @@ public class customView extends View {
     public void setWantTextOverTheImage(boolean wantTextOverTheImage) {
         this.wantTextOverTheImage = wantTextOverTheImage;
         invalidate();
+    }
+
+    public long getRotatingInverseRate() {
+        return rotatingInverseRate;
+    }
+
+    public void setRotatingInverseRate(long rotatingInverseRate) {
+        this.rotatingInverseRate = rotatingInverseRate;
     }
 }
