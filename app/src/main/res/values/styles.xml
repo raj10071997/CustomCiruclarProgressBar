@@ -8,9 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="DialogAnimation">
-        <item name="android:windowEnterAnimation">@anim/translate_up</item>
-       <!-- <item name="android:windowExitAnimation">@anim/translate_up</item> -->
-    </style>
+
 
 </resources>
