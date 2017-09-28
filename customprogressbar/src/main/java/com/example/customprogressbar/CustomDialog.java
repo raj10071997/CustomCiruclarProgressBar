@@ -1,4 +1,4 @@
-package com.example.dhanraj.microphonecustomview;
+package com.example.customprogressbar;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -6,11 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
-import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by dhanraj on 26/9/17.

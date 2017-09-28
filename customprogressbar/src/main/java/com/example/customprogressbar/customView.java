@@ -1,17 +1,12 @@
-package com.example.dhanraj.microphonecustomview;
+package com.example.customprogressbar;
 
-import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -19,16 +14,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static java.lang.Thread.sleep;
-import static java.sql.Types.NULL;
 
 /**
  * Created by dhanraj on 24/8/17.
@@ -108,7 +95,7 @@ public class customView extends View {
         textPaint.setStyle(Paint.Style.STROKE);
         textPaint.setStrokeWidth(1);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        //set the size with repect to the radius of the circle
+        //set the size with respect to the radius of the circle
         //textPaint.setTextSize((float)(Math.sqrt(2)*imageSize)/2);
         textPaint.setTextSize((float)getLabelSize());
 
@@ -287,6 +274,8 @@ public class customView extends View {
                 {
                     checkDown = true;
                     animated=true;
+                    animated2=false;
+                    rotate=false;
                     invalidate();
                 }
                     break;
