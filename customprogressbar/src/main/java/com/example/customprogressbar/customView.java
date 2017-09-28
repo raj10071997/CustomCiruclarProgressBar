@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import static java.lang.Thread.sleep;
 
@@ -36,7 +39,7 @@ public class customView extends View {
     int topdegree = -90;
     int bottomdegree = 90;
     int degree1 = -90,degree2=220;
-    boolean checkDown = false,first =true,rotate = false,dialog_animation,wantTextOverTheImage=true;
+    boolean checkDown = false,rotate = false,dialog_animation,wantTextOverTheImage=true;
     int labelColor,mainCircleColor,labelSize,rotatingBarColor;
     float strokeWidth,mainCirCleRadius,sweepAngle;
     int ImageID;
@@ -76,28 +79,23 @@ public class customView extends View {
 
 
     private void init(Context context) {
-
         strokePaint = new Paint();
         strokePaint.setAntiAlias(true);
         strokePaint.setStyle(Paint.Style.STROKE);
-        Log.d("mainColor", String.valueOf(getMainCircleColor()));
-        strokePaint.setColor(getMainCircleColor());
-        strokePaint.setStrokeWidth(getStrokeWidth());
+
 
         linePaint = new Paint();
         linePaint.setAntiAlias(true);
-        linePaint.setColor(getRotatingBarColor());
         linePaint.setStyle(Paint.Style.STROKE);
-        linePaint.setStrokeWidth(getStrokeWidth());
+
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setColor(getLabelColor());
         textPaint.setStyle(Paint.Style.STROKE);
         textPaint.setStrokeWidth(1);
         textPaint.setTextAlign(Paint.Align.CENTER);
         //set the size with respect to the radius of the circle
         //textPaint.setTextSize((float)(Math.sqrt(2)*imageSize)/2);
-        textPaint.setTextSize((float)getLabelSize());
+
 
 
         cd = new CustomDialog(getContext());
@@ -157,17 +155,26 @@ public class customView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        strokePaint.setColor(getMainCircleColor());
+        strokePaint.setStrokeWidth(getStrokeWidth());
+
+        linePaint.setColor(getRotatingBarColor());
+        linePaint.setStrokeWidth(getStrokeWidth());
+
+        textPaint.setColor(getLabelColor());
+        textPaint.setTextSize((float)getLabelSize());
+
             canvas.drawCircle(width/2,height/2,(float)(Math.sqrt(2)*imageSize)/2,strokePaint);
 
             if(micro == null){
-                micro = ContextCompat.getDrawable(getContext(),ImageID);
+                micro = ContextCompat.getDrawable(getContext(),getImageID());
                 micro.setFilterBitmap(true);
                 micro.setBounds((width - imageSize) / 2, (height - imageSize) / 2, width - ((width - imageSize) / 2), height - ((height - imageSize) / 2));
                 // micro.setBounds(0, 0, width , height );
             }
 
             micro.draw(canvas);
-            first=false;
+
 
 
 
@@ -178,10 +185,10 @@ public class customView extends View {
             {
                 canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                         (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                        (float)degree1,(float)sweepAngle,false,linePaint);
+                        (float)degree1,(float)getSweepAngle(),false,linePaint);
                 canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                         (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                        (float)degree2,(float)sweepAngle,false,linePaint);
+                        (float)degree2,(float)getSweepAngle(),false,linePaint);
 
 
             }
@@ -197,18 +204,18 @@ public class customView extends View {
 
                     canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                             (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                            (float)topdegree,(float)sweepAngle,false,linePaint);
+                            (float)topdegree,(float)getSweepAngle(),false,linePaint);
 
                     canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
                             (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                            (float)bottomdegree,(float)sweepAngle,false,linePaint);
+                            (float)bottomdegree,(float)getSweepAngle(),false,linePaint);
 
                     if(wantTextOverTheImage)
                     {
                         canvas.drawText(dialogText2,width/2,height/2,textPaint);
 
-                        if(dialogText2.length()==label.length()+3)
-                            dialogText2=label;
+                        if(dialogText2.length()==getLabel().length()+3)
+                            dialogText2=getLabel();
                         else
                             dialogText2=dialogText2+".";
                     }
@@ -251,7 +258,7 @@ public class customView extends View {
         {
 
             try {
-                sleep(rotatingInverseRate);
+                sleep(getRotatingInverseRate());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -338,7 +345,7 @@ public class customView extends View {
         rotate=false;
         hideDialog();
         try {
-            sleep(100);
+            sleep(50);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -400,6 +407,7 @@ public class customView extends View {
 
     public void setMainCircleColor(int mainCircleColor) {
         this.mainCircleColor = mainCircleColor;
+
         invalidate();
     }
 

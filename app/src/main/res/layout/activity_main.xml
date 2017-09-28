@@ -14,14 +14,14 @@
         android:layout_centerVertical="true"
         whatever:Image="@drawable/microphone"
         whatever:label="wait"
-        whatever:label_size="40"
         whatever:main_circle_color="#097054"
+        whatever:label_size="40"
         whatever:stroke_width="20"
         whatever:rotatingInverseRate="200"
         whatever:sweep_angle="50"
         whatever:label_color="#FF9900"
-        whatever:rotating_bar_color="#6599FF"
-    />
+        whatever:rotating_bar_color="#6599FF"/>
+
 
     <Button
         android:layout_width="wrap_content"
