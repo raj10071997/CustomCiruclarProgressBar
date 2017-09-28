@@ -300,7 +300,7 @@ public class customView extends View {
                 rotate=true;
                 invalidate();
               //  cd.show();
-               // showDialog(mContext);
+                showDialog(mContext);
                 break;
         }
 
