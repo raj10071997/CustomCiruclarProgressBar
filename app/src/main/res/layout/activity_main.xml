@@ -15,7 +15,7 @@
         whatever:Image="@drawable/microphone"
         whatever:label="wait"
         whatever:main_circle_color="#097054"
-        whatever:label_size="40"
+        whatever:label_size="80"
         whatever:stroke_width="20"
         whatever:rotatingInverseRate="200"
         whatever:sweep_angle="50"

@@ -46,6 +46,7 @@ public class customView extends View {
     private Dialog overlayDialog;
     private Context mContext;
     private boolean animated,animated2;
+    private float fingerX,fingerY;
 
 
 
@@ -91,7 +92,7 @@ public class customView extends View {
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setStyle(Paint.Style.STROKE);
-        textPaint.setStrokeWidth(1);
+        textPaint.setStrokeWidth(2);
         textPaint.setTextAlign(Paint.Align.CENTER);
         //set the size with respect to the radius of the circle
         //textPaint.setTextSize((float)(Math.sqrt(2)*imageSize)/2);
@@ -190,6 +191,8 @@ public class customView extends View {
                         (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
                         (float)degree2,(float)getSweepAngle(),false,linePaint);
 
+                canvas.drawCircle(fingerX,fingerY,(float)30.0,textPaint);
+
 
             }
             else
@@ -272,8 +275,8 @@ public class customView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int eventAction = event.getAction();
-        float x = event.getX();
-        float y = event.getY();
+         fingerX = event.getX();
+         fingerY = event.getY();
         switch(eventAction)
         {
             case MotionEvent.ACTION_DOWN:
