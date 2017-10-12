@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -17,6 +18,7 @@ public class CustomDialog extends Dialog {
 
 
     public TextView textView;
+    public Button replaceFiles,copyFiles,cancel;
 
     public CustomDialog(@NonNull Context context) {
         super(context);
@@ -37,7 +39,10 @@ public class CustomDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.custom_dialog);
         textView = (TextView) findViewById(R.id.mytext);
-        textView.setText("wait...");
+        textView.setText("Do you want to replace these files or want to make more copies of it?");
+       // replaceFiles = (Button) findViewById(R.id.replaceFiles);
+        //copyFiles = (Button) findViewById(R.id.copyFiles);
+        //cancel = (Button) findViewById(R.id.cancel);
 
 
     }
