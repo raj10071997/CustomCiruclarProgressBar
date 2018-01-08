@@ -268,6 +268,7 @@ public class customView extends View {
                 animated2=true;
                 rotate=true;
                 invalidate();
+
               //  cd.show();
                 showDialog(mContext);
                 break;
