@@ -26,7 +26,6 @@ import static java.lang.Thread.sleep;
 
 public class customView extends View {
 
-
     private Drawable micro;
     private CustomDialog cd;
     private Paint strokePaint,linePaint,textPaint;
@@ -49,13 +48,11 @@ public class customView extends View {
     private float fingerX,fingerY;
 
 
-
     public customView(Context context) {
         super(context);
         mContext=context;
         init(context);
     }
-
 
     public customView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -78,17 +75,14 @@ public class customView extends View {
         init(context);
     }
 
-
     private void init(Context context) {
         strokePaint = new Paint();
         strokePaint.setAntiAlias(true);
         strokePaint.setStyle(Paint.Style.STROKE);
 
-
         linePaint = new Paint();
         linePaint.setAntiAlias(true);
         linePaint.setStyle(Paint.Style.STROKE);
-
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setStyle(Paint.Style.STROKE);
@@ -97,19 +91,12 @@ public class customView extends View {
         //set the size with respect to the radius of the circle
         //textPaint.setTextSize((float)(Math.sqrt(2)*imageSize)/2);
 
-
-
         cd = new CustomDialog(getContext());
         //change the value below
         if(true) //dialog_animation
         cd.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
 
-
-
-
        // cd.textView.setText("wait...");
-
-
 
     }
 
@@ -149,9 +136,6 @@ public class customView extends View {
         a.recycle();
     }
 
-
-
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -176,9 +160,6 @@ public class customView extends View {
 
             micro.draw(canvas);
 
-
-
-
         if(checkDown)
         {
 
@@ -192,69 +173,57 @@ public class customView extends View {
                         (float)degree2,(float)getSweepAngle(),false,linePaint);
 
                 canvas.drawCircle(fingerX,fingerY,(float)30.0,textPaint);
-
-
             }
             else
                 animated=false;
 
             canvasAnimate(canvas);
-
         }
 
         if(rotate)
         {
+                canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
+                        (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
+                        (float)topdegree,(float)getSweepAngle(),false,linePaint);
 
-                    canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
-                            (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                            (float)topdegree,(float)getSweepAngle(),false,linePaint);
+                canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
+                        (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
+                        (float)bottomdegree,(float)getSweepAngle(),false,linePaint);
 
-                    canvas.drawArc((float)(width/2-(Math.sqrt(2)*imageSize)/2),(float)((height/2)-(Math.sqrt(2)*imageSize)/2),
-                            (float)((width/2)+(Math.sqrt(2)*imageSize)/2),(float)((height/2)+(Math.sqrt(2)*imageSize)/2),
-                            (float)bottomdegree,(float)getSweepAngle(),false,linePaint);
+                if(wantTextOverTheImage)
+                {
+                    canvas.drawText(dialogText2,width/2,height/2,textPaint);
 
-                    if(wantTextOverTheImage)
-                    {
-                        canvas.drawText(dialogText2,width/2,height/2,textPaint);
+                    if(dialogText2.length()==getLabel().length()+3)
+                        dialogText2=getLabel();
+                    else
+                        dialogText2=dialogText2+".";
+                }
 
-                        if(dialogText2.length()==getLabel().length()+3)
-                            dialogText2=getLabel();
-                        else
-                            dialogText2=dialogText2+".";
-                    }
+                topdegree+=5;
+                bottomdegree+=5;
 
+                if(topdegree>=360)
+                    topdegree=0;
 
-                    topdegree+=5;
-                    bottomdegree+=5;
+                if(bottomdegree>=360)
+                    bottomdegree=0;
 
-                    if(topdegree>=360)
-                        topdegree=0;
-
-                    if(bottomdegree>=360)
-                        bottomdegree=0;
-
-              canvasAnimate(canvas);
-
-
+                canvasAnimate(canvas);
         }
-
-
     }
 
     private void canvasAnimate(final Canvas canvas) {
 
-
         if(animated) {
 
-                    invalidate();
+            invalidate();
 
-                    if(degree1<40)
-                    degree1+=10;
+            if(degree1<40)
+            degree1+=10;
 
-                    if(degree2>90)
-                       degree2-=10;
-
-
+            if(degree2>90)
+               degree2-=10;
         }
 
         if(animated2)
@@ -271,9 +240,9 @@ public class customView extends View {
 
     }
 
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
         int eventAction = event.getAction();
          fingerX = event.getX();
          fingerY = event.getY();
@@ -302,13 +271,11 @@ public class customView extends View {
 
               //  cd.show();
                 showDialog(mContext);
-
                 break;
         }
 
         return true;
     }
-
 
     public void showDialog(Context context) {
 
@@ -325,8 +292,6 @@ public class customView extends View {
         }
         overlayDialog.cancel();
     }
-
-
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

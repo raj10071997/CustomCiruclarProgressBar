@@ -20,17 +20,14 @@
         android:layout_height="wrap_content"
         android:background="#FF9900"
         >
-        <com.mikepenz.iconics.view.IconicsImageView
+
+       <!-- <com.mikepenz.iconics.view.IconicsImageView
             android:id="@+id/replace_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
-            app:iiv_icon="gmd-insert-drive-file" />
-
-
-
-
+            app:iiv_icon="gmd-insert-drive-file" />-->
 
     </RelativeLayout>
 
