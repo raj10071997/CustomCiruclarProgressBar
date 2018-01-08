@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/MicroPhoneCustomView.iml" filepath="$PROJECT_DIR$/MicroPhoneCustomView.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/customprogressbar/customprogressbar.iml" filepath="$PROJECT_DIR$/customprogressbar/customprogressbar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dummy/dummy.iml" filepath="$PROJECT_DIR$/dummy/dummy.iml" />
     </modules>
   </component>
 </project>

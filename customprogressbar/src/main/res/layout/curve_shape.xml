@@ -4,18 +4,12 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <solid android:color="#ffffff" />
+    <solid android:color="#6599FF" />
 
     <stroke
         android:width="5dp"
-        android:color="#000000" />
+        android:color="#097054" />
 
-
-   <!-- <corners
-        android:bottomLeftRadius="20dp"
-        android:bottomRightRadius="20dp"
-        android:topLeftRadius="20dp"
-        android:topRightRadius="20dp" />-->
     <padding
         android:left="10dp"
         android:right="10dp"
