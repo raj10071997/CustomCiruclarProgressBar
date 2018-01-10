@@ -59,4 +59,4 @@ For stopping the progress just call stopProgressing() method of the custom view.
 ```
 
 # License
-<b>Croller</b> is licensed under `MIT license`. View [license](LICENSE.md).
+<b>CustomCircularProgressBar</b> is licensed under `MIT license`. View [license](LICENSE.md).
