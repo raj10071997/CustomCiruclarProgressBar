@@ -12,7 +12,7 @@ Step 1. Add the JitPack repository to your build file. Add it in your root build
 Step 2. Add the dependency
 
     dependencies {
-	        compile 'com.github.raj10071997:CustomCiruclarProgressBar:1.0.0'
+	        compile 'com.github.raj10071997:CustomCiruclarProgressBar:1.0.1'
 	}
   
   
