@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //not working
+
         myview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
