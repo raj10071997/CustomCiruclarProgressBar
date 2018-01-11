@@ -21,10 +21,6 @@ Step 2. Add the dependency
 ![videotogif_2017 09 28_14 39 46](https://user-images.githubusercontent.com/24502136/30959211-132d06d8-a45d-11e7-82ce-440d7e1ef9a9.gif)
 
 
-```
-For stopping the progress just call stopProgressing() method of the custom view.
-```
-
 ### XML
 ```xml
 <com.example.customprogressbar.customView
@@ -56,6 +52,10 @@ For stopping the progress just call stopProgressing() method of the custom view.
         myview.setLabelSize(40);
         myview.setLabelColor(Color.parseColor("#FF9900"));
         myview.setMainCircleColor(Color.parseColor("#097054"));
+```
+
+```
+For stopping the progress just call myview.stopProgressing() method of the custom view.
 ```
 
 # License
