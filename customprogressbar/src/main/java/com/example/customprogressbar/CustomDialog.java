@@ -39,7 +39,7 @@ public class CustomDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.custom_dialog);
         textView = (TextView) findViewById(R.id.mytext);
-        textView.setText("Do you want to replace these files or want to make more copies of it?");
+        textView.setText("Wait for sometime..!!");
        // replaceFiles = (Button) findViewById(R.id.replaceFiles);
         //copyFiles = (Button) findViewById(R.id.copyFiles);
         //cancel = (Button) findViewById(R.id.cancel);
